@@ -27,9 +27,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-/**
-  @author Giovanni Caire - TILAB
- */
+
 class BookSellerNegGui extends JFrame {
 	private BookSellerNegAgent myAgent;
 	

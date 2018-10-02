@@ -33,6 +33,8 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
+import java.util.Hashtable;
+
 public class BookBuyerNegAgent extends Agent {
 	// The title of the book to buy
 	private String targetBookTitle;
@@ -40,54 +42,53 @@ public class BookBuyerNegAgent extends Agent {
 	private AID[] sellerAgents;
 	private int maxPrice;
 	private int priceNeg;
+	private BookBuyerNegGui myGui;
+	private Hashtable catalogue;
+	private boolean isSearch = false;
+	private int bank = 0;
 
 	// Put agent initializations here
 	protected void setup() {
 		// Printout a welcome message
 		System.out.println("Hello! Buyer-agent "+getAID().getName()+" is ready.");
 
-		// Get the title of the book to buy as a start-up argument
-		Object[] args = getArguments();
-        System.out.println(args[1]);
-		if (args != null && args.length > 0) {
-			targetBookTitle = (String) args[0];
-			if(args[1] != null){
-                maxPrice = Integer.parseInt((String)args[1]);
-            }
-			System.out.println("Target ticket is "+targetBookTitle + " at cost: " + maxPrice );
+		// Create the catalogue
+		catalogue = new Hashtable();
 
-			// Add a TickerBehaviour that schedules a request to seller agents every minute
-			addBehaviour(new TickerBehaviour(this, 10000) {
-				protected void onTick() {
-					System.out.println("Trying to buy "+targetBookTitle);
-					// Update the list of seller agents
-					DFAgentDescription template = new DFAgentDescription();
-					ServiceDescription sd = new ServiceDescription();
-					sd.setType("book-selling");
-					template.addServices(sd);
-					try {
-						DFAgentDescription[] result = DFService.search(myAgent, template); 
-						System.out.println("Found the following seller agents:");
-						sellerAgents = new AID[result.length];
-						for (int i = 0; i < result.length; ++i) {
-							sellerAgents[i] = result[i].getName();
-							System.out.println(sellerAgents[i].getName());
-						}
-					}
-					catch (FIPAException fe) {
-						fe.printStackTrace();
-					}
+		// Create and show the GUI
+		myGui = new BookBuyerNegGui(this);
+		myGui.showGui();
 
-					// Perform the request
-					myAgent.addBehaviour(new RequestPerformer());
-				}
-			} );
-		}
-		else {
-			// Make the agent terminate
-			System.out.println("No target ticket title specified");
-			doDelete();
-		}
+
+        if(isSearch) {
+            // Add a TickerBehaviour that schedules a request to seller agents every minute
+            addBehaviour(new TickerBehaviour(this, 10000) {
+                protected void onTick() {
+
+                    System.out.println("Trying to buy "+targetBookTitle);
+                    // Update the list of seller agents
+                    DFAgentDescription template = new DFAgentDescription();
+                    ServiceDescription sd = new ServiceDescription();
+                    sd.setType("book-selling");
+                    template.addServices(sd);
+                    try {
+                        DFAgentDescription[] result = DFService.search(myAgent, template);
+                        System.out.println("Found the following seller agents:");
+                        sellerAgents = new AID[result.length];
+                        for (int i = 0; i < result.length; ++i) {
+                            sellerAgents[i] = result[i].getName();
+                            System.out.println(sellerAgents[i].getName());
+                        }
+                    }
+                    catch (FIPAException fe) {
+                        fe.printStackTrace();
+                    }
+
+                    // Perform the request
+                    myAgent.addBehaviour(new RequestPerformer());
+                }
+            } );
+        }
 	}
 
 	// Put agent clean-up operations here
@@ -96,6 +97,24 @@ public class BookBuyerNegAgent extends Agent {
 		System.out.println("Buyer-agent "+getAID().getName()+" terminating.");
 	}
 
+	public void updateCatalogue(final String title, final int price) {
+		addBehaviour(new OneShotBehaviour() {
+			public void action() {
+				catalogue.put(title, new Integer(price));
+				System.out.println(title+" inserted into shopping list with a limit buy of : "+ price);
+				System.out.println("The new shopping list is : " + catalogue.keySet());
+			}
+		} );
+	}
+
+    public void updateBank(final int price) {
+        addBehaviour(new OneShotBehaviour() {
+            public void action() {
+                bank += price;
+                System.out.println("New sold : " + bank);
+            }
+        } );
+    }
 	/**
 	   Inner class RequestPerformer.
 	   This is the behaviour used by Book-buyer agents to request seller 
