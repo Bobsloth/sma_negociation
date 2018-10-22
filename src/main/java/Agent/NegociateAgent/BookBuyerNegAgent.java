@@ -159,7 +159,7 @@ public class BookBuyerNegAgent extends Agent {
 				// Negociate for a better offer
 				ACLMessage negociate = new ACLMessage(ACLMessage.PROPOSE);
 				if(priceNeg < maxPrice || priceNeg < bestPrice) {
-					priceNeg = priceNeg + 10;
+					priceNeg = priceNeg + 1;
 
 					negociate.setContent(targetBookTitle +","+ priceNeg);
 					System.out.println("Bonjour, je voudrais vous acheter " + targetBookTitle + " à "+ priceNeg);
