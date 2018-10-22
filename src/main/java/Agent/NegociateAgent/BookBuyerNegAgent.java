@@ -37,6 +37,7 @@ public class BookBuyerNegAgent extends Agent {
 	// The title of the book to buy
 	private String targetBookTitle;
 	// The list of known seller agents
+
 	private AID[] sellerAgents;
 	private int maxPrice;
 	private int priceNeg;
