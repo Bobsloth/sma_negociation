@@ -36,20 +36,30 @@ import java.util.*;
 
 public class BookSellerNegAgent extends Agent {
 	// The catalogue of books for sale (maps the title of a book to its price)
-	private Hashtable catalogue;
+	//private Hashtable catalogue;
 	// The GUI by means of which the user can add books in the catalogue
-	private BookSellerNegGui myGui;
+	//private BookSellerNegGui myGui;
+	private BookList sellList;
+
+    public void addBookList(BookList _sellList){
+        sellList = _sellList;
+    }
+
 
 	// Put agent initializations here
-	protected void setup() {
+	public void setup() {
 		// Create the catalogue
-		catalogue = new Hashtable();
+		//catalogue = new Hashtable();
 
 		// Create and show the GUI 
-		myGui = new BookSellerNegGui(this);
-		myGui.showGui();
+		//myGui = new BookSellerNegGui(this);
+		//myGui.showGui();
 
 		// Register the book-selling service in the yellow pages
+
+		Object[] args = getArguments();
+		sellList = (BookList)args[0];
+
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -80,7 +90,7 @@ public class BookSellerNegAgent extends Agent {
 			fe.printStackTrace();
 		}
 		// Close the GUI
-		myGui.dispose();
+		//myGui.dispose();
 		// Printout a dismissal message
 		System.out.println("Seller-agent "+getAID().getName()+" terminating.");
 	}
@@ -91,7 +101,7 @@ public class BookSellerNegAgent extends Agent {
 	public void updateCatalogue(final String title, final int price) {
 		addBehaviour(new OneShotBehaviour() {
 			public void action() {
-				catalogue.put(title, new Integer(price));
+				sellList.addBook(title, price);
 				System.out.println(title+" inserted into catalogue. Price = "+price);
 			}
 		} );
@@ -113,8 +123,8 @@ public class BookSellerNegAgent extends Agent {
 				// CFP Message received. Process it
 				String title = msg.getContent();
 				ACLMessage reply = msg.createReply();
-
-				Integer price = (Integer) catalogue.get(title);
+                sellList.printBooks();
+				Integer price =  sellList.get(title);
 				if (price != null) {
 					// The requested book is available for sale. Reply with the price
 					reply.setPerformative(ACLMessage.INFORM);
@@ -152,10 +162,11 @@ public class BookSellerNegAgent extends Agent {
 				int priceBuyer = Integer.parseInt(tokens[1]);
 				String title = tokens[0];
 				ACLMessage reply = msg.createReply();
-				Integer realPrice = (Integer) catalogue.get(title);
+				Integer realPrice = (Integer) sellList.get(title);
 				System.out.println("price buyer: " + priceBuyer);
 				if (priceBuyer >= realPrice* 0.8) {
-                    Integer price = (Integer) catalogue.remove(title);
+                    Integer price = sellList.get(title);
+                    sellList.remove(title,sellList.get(title));
                     if (price != null)
 					{
 						reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);

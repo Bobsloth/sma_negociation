@@ -83,6 +83,7 @@ public class BookBuyerAgent extends Agent {
             addBehaviour(new TickerBehaviour(this, 6000) {
                 protected void onTick() {
                     System.out.println("Trying to buy " + targetBookTitle);
+
                     // Update the list of seller agents
                     DFAgentDescription template = new DFAgentDescription();
                     ServiceDescription sd = new ServiceDescription();
