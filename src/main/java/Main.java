@@ -100,7 +100,7 @@ public class Main {
             AgentContainer agentContainer = runtime.createMainContainer(prolfile);
             agentContainer.start();
             AgentController agentB1 = null;
-            AgentController agentB2 = null;
+            //AgentController agentB2 = null;
             AgentController agentS1 = null;
             AgentController agentS2 = null;
             AgentController agentS3 = null;
@@ -109,8 +109,8 @@ public class Main {
 
             agentB1 = agentContainer.createNewAgent("Bob",
                     "Agent.NegociateAgent.BookBuyerNegAgent", new BookList[]{b1});
-            agentB2 = agentContainer.createNewAgent("LeMangeurDeTomate",
-                    "Agent.NegociateAgent.BookBuyerNegAgent", new BookList[]{b2});
+            //agentB2 = agentContainer.createNewAgent("LeMangeurDeTomate",
+             //       "Agent.NegociateAgent.BookBuyerNegAgent", new BookList[]{b2});
 
             agentS1 = agentContainer.createNewAgent("Ted",
                     "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s1});
@@ -122,14 +122,14 @@ public class Main {
                     "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s4});
             agentS5 = agentContainer.createNewAgent("Gnah",
                     "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s5});
-            Thread.sleep(60000);
+            //Thread.sleep(60000);
             agentS1.start();
             agentS2.start();
             agentS3.start();
             agentS4.start();
             agentS5.start();
             agentB1.start();
-            agentB2.start();
+            //agentB2.start();
             /*BookBuyerNegAgent buyer1 = new BookBuyerNegAgent();
             buyer1.addBookList(b1);
             buyer1.setup();
@@ -154,9 +154,9 @@ public class Main {
 
         } catch (ControllerException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        } //catch (InterruptedException e) {
+           // e.printStackTrace();
+        //}
     }
 }
 
