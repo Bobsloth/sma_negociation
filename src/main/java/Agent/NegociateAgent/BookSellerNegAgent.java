@@ -123,7 +123,7 @@ public class BookSellerNegAgent extends Agent {
 				// CFP Message received. Process it
 				String title = msg.getContent();
 				ACLMessage reply = msg.createReply();
-                sellList.printBooks();
+                //sellList.printBooks();
 				Integer price =  sellList.get(title);
 				if (price != null) {
 					// The requested book is available for sale. Reply with the price
@@ -166,11 +166,17 @@ public class BookSellerNegAgent extends Agent {
 				System.out.println("price buyer: " + priceBuyer);
 				if (priceBuyer >= realPrice* 0.8) {
                     Integer price = sellList.get(title);
-                    sellList.remove(title,sellList.get(title));
+                    //sellList.remove(title,sellList.get(title));
                     if (price != null)
 					{
+
 						reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+						sellList.remove(title,realPrice);
 						System.out.println("J'accepte de vous le vendre!");
+						if (sellList.size() == 0){
+							myAgent.doDelete();
+						}
+
 					}
 					else {
 						// The requested book has been sold to another buyer in the meanwhile .

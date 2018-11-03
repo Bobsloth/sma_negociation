@@ -40,7 +40,7 @@ public class Main {
         BookList b1 = new BookList(0, hmb1);
 
         HashMap<String, Integer> hmb2 = new HashMap<>();
-        hmb2.put("Drizzt",null);
+        hmb2.put("LOTR",null);
         hmb2.put("Ellana",null);
         BookList b2 = new BookList(0, hmb2);
 
@@ -56,12 +56,12 @@ public class Main {
         BookList s2 = new BookList(25,hms2);
 
         HashMap<String, Integer> hms3 = new HashMap<>();
-        hms3.put("LOTR",3);
+        //hms3.put("LOTR",3);
         hms3.put("Drizzt",7);
         BookList s3 = new BookList(20,hms3);
 
         HashMap<String, Integer> hms4 = new HashMap<>();
-        hms4.put("LOTR",4);
+        //hms4.put("LOTR",4);
         hms4.put("Snoopy",5);
         hms4.put("Ellana",3);
         BookList s4 = new BookList(20,hms4);
@@ -95,11 +95,12 @@ public class Main {
         try {
             Runtime runtime = Runtime.instance();
             Properties properties = new ExtendedProperties();
-            //properties.setProperty(Profile.GUI, "true");
+            properties.setProperty(Profile.GUI, "true");
             Profile prolfile = new ProfileImpl(properties);
             AgentContainer agentContainer = runtime.createMainContainer(prolfile);
             agentContainer.start();
             AgentController agentB1 = null;
+            AgentController agentB2 = null;
             AgentController agentS1 = null;
             AgentController agentS2 = null;
             AgentController agentS3 = null;
@@ -108,24 +109,27 @@ public class Main {
 
             agentB1 = agentContainer.createNewAgent("Bob",
                     "Agent.NegociateAgent.BookBuyerNegAgent", new BookList[]{b1});
+            agentB2 = agentContainer.createNewAgent("LeMangeurDeTomate",
+                    "Agent.NegociateAgent.BookBuyerNegAgent", new BookList[]{b2});
 
             agentS1 = agentContainer.createNewAgent("Ted",
                     "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s1});
             agentS2 = agentContainer.createNewAgent("Fred",
                     "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s2});
             agentS3 = agentContainer.createNewAgent("Karl",
-                    "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s1});
+                    "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s3});
             agentS4 = agentContainer.createNewAgent("Hans",
-                    "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s2});
+                    "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s4});
             agentS5 = agentContainer.createNewAgent("Gnah",
-                    "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s1});
-
-            agentB1.start();
+                    "Agent.NegociateAgent.BookSellerNegAgent", new BookList[]{s5});
+            Thread.sleep(60000);
             agentS1.start();
             agentS2.start();
             agentS3.start();
             agentS4.start();
             agentS5.start();
+            agentB1.start();
+            agentB2.start();
             /*BookBuyerNegAgent buyer1 = new BookBuyerNegAgent();
             buyer1.addBookList(b1);
             buyer1.setup();
@@ -149,6 +153,8 @@ public class Main {
 
 
         } catch (ControllerException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

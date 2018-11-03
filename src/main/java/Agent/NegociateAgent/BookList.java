@@ -4,13 +4,13 @@ import java.util.*;
 
 public class BookList {
 
-    private Integer price;
+    private Integer priceLot;
     //private ArrayList<Integer> books;
     private HashMap<String, Integer> books;
     private Integer total;
 
 public BookList(Integer _price, HashMap<String, Integer>  _books){
-        price = _price;
+        priceLot = _price;
         books = _books;
         total = 0;
     }

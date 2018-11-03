@@ -33,6 +33,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class BookBuyerNegAgent extends Agent {
@@ -40,7 +41,7 @@ public class BookBuyerNegAgent extends Agent {
 	private String targetBookTitle;
 	// The list of known seller agents
 
-
+    private ArrayList<String> bookRemaining = new ArrayList<>();
 	private BookList buyList ;
 
 	private AID[] sellerAgents;
@@ -58,8 +59,10 @@ public class BookBuyerNegAgent extends Agent {
         // Get the title of the book to buy as a start-up argument
         Object[] args = getArguments();
         buyList = (BookList)args[0];
-
-
+        for (String book : buyList.getBooks().keySet()) {
+            bookRemaining.add(book);
+        }
+        targetBookTitle = bookRemaining.get(0);
         buyList.printBooks();
         if (args != null && args.length > 0) {
             //targetBookTitle = (String) args[0];
@@ -71,13 +74,14 @@ public class BookBuyerNegAgent extends Agent {
             //System.out.println("Target ticket is "+targetBookTitle + " at cost: " + maxPrice );
             System.out.println("Target is " + buyList);
 
-            for( String book: buyList.getBooks().keySet()){
+            //for( String book: buyList.getBooks().keySet()){
 
             // Add a TickerBehaviour that schedules a request to seller agents every minute
             addBehaviour(new TickerBehaviour(this, 10000) {
                 protected void onTick() {
-                    targetBookTitle = book;
-                    System.out.println("Trying to buy " + targetBookTitle);
+                    //targetBookTitle = book;
+                    //System.out.println("Trying to buy " + targetBookTitle);
+                    System.out.println("Update list of agent");
                     // Update the list of seller agents
                     DFAgentDescription template = new DFAgentDescription();
                     ServiceDescription sd = new ServiceDescription();
@@ -101,7 +105,7 @@ public class BookBuyerNegAgent extends Agent {
                     myAgent.addBehaviour(new RequestPerformer());
                 }
             });
-        }
+        //}
             //doDelete();
         }
         //else {
@@ -128,15 +132,11 @@ public class BookBuyerNegAgent extends Agent {
 		private int repliesCnt = 0; // The counter of replies from seller agents
 		private MessageTemplate mt; // The template to receive replies
 		private int step = 0;
-
 		public void action() {
-            HashMap<String, Integer> bestComb = new HashMap<>();
-		    while(buyList.missingBook(bestComb) != null) {
                 switch (step) {
                     case 0:
+
                         // Send the cfp to all sellers
-                        maxPrice = 20;
-                        priceNeg = (int) (maxPrice * 0.60);
                         ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
                         for (int i = 0; i < sellerAgents.length; ++i) {
                             cfp.addReceiver(sellerAgents[i]);
@@ -168,6 +168,8 @@ public class BookBuyerNegAgent extends Agent {
                             repliesCnt++;
                             if (repliesCnt >= sellerAgents.length) {
                                 // We received all replies
+                                maxPrice = bestPrice;
+                                priceNeg = (int) (maxPrice * 0.60);
                                 System.out.println("Priceneg: " + priceNeg);
                                 step = 2;
 
@@ -208,19 +210,50 @@ public class BookBuyerNegAgent extends Agent {
                                 // Purchase successful. We can terminate
                                 System.out.println(targetBookTitle + " successfully purchased from agent " + reply.getSender().getName());
                                 System.out.println("Price = " + priceNeg);
-                                buyList.addBook(targetBookTitle,priceNeg);
-                                step = 4;
+                                buyList.addBook(targetBookTitle, priceNeg);
+                                bookRemaining.remove(targetBookTitle);
+                                if (!bookRemaining.isEmpty())
+                                {
+                                    targetBookTitle = bookRemaining.get(0);
+                                    System.out.println("Nouveau livre en achat :"+ targetBookTitle);
+                                    step = 4;
+                                }
+                                else
+                                {
+                                    myAgent.doDelete();
+                                }
+
                             } else if (reply.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
                                 step = 2;
                                 System.out.println("Je ne peux accepter votre offre");
                                 if (Integer.parseInt(reply.getContent()) > maxPrice) {
                                     System.out.println("Nous ne ferons donc pas affaire");
-                                    step = 4;
+
+                                    if (!bookRemaining.isEmpty())
+                                    {
+                                        targetBookTitle = bookRemaining.get(0);
+                                        System.out.println("Nouveau livre en achat :"+ targetBookTitle);
+
+                                        step = 4;
+                                    }
+                                    else
+                                    {
+                                        myAgent.doDelete();
+                                    }
                                 }
 
                             } else {
                                 System.out.println("Attempt failed: ticket already sold.");
-                                step = 4;
+                                if (!bookRemaining.isEmpty())
+                                {
+                                    targetBookTitle = bookRemaining.get(0);
+                                    System.out.println("Nouveau livre en achat :"+ targetBookTitle);
+                                    step = 4;
+                                }
+                                else
+                                {
+                                    myAgent.doDelete();
+                                }
                             }
 
 
@@ -229,8 +262,7 @@ public class BookBuyerNegAgent extends Agent {
                         }
                         break;
                 }
-            }
-            myAgent.doDelete();
+
 		}
 
 		public boolean done() {
