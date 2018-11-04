@@ -95,7 +95,7 @@ public class Main {
         try {
             Runtime runtime = Runtime.instance();
             Properties properties = new ExtendedProperties();
-            properties.setProperty(Profile.GUI, "true");
+            //properties.setProperty(Profile.GUI, "true");
             Profile prolfile = new ProfileImpl(properties);
             AgentContainer agentContainer = runtime.createMainContainer(prolfile);
             agentContainer.start();

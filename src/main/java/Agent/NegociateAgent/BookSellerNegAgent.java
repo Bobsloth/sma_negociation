@@ -163,7 +163,7 @@ public class BookSellerNegAgent extends Agent {
 				String title = tokens[0];
 				ACLMessage reply = msg.createReply();
 				Integer realPrice = (Integer) sellList.get(title);
-				System.out.println("price buyer: " + priceBuyer);
+				//System.out.println("price buyer: " + priceBuyer);
 				if (priceBuyer >= realPrice* 0.8) {
                     Integer price = sellList.get(title);
                     //sellList.remove(title,sellList.get(title));
