@@ -70,7 +70,6 @@ public class BookBuyerNegAgent extends Agent {
                 maxPrice = Integer.parseInt((String) args[1]);
             }*/
 
-            System.out.println("POUET");
             //System.out.println("Target ticket is "+targetBookTitle + " at cost: " + maxPrice );
             System.out.println("Target is " + buyList);
 
